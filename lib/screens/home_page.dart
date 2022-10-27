@@ -1,3 +1,4 @@
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pill_app/state.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ class HomePage extends StatelessWidget {
 
   static const List<ChartData> chartData = [
     ChartData('Full', 10, consts.green),
-    ChartData('Empty', 3, Color.fromRGBO(0, 0, 0, 0)),
+    ChartData('Empty', 0, Color.fromRGBO(0, 0, 0, 0)),
   ];
 
   @override
@@ -23,62 +24,64 @@ class HomePage extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 35, left: 24, right: 24),
-        child: Column(
-          children: [
-            const Day(),
-            const SizedBox(height: consts.s24),
-            Container(
-              height: 126,
-              padding: const EdgeInsets.all(21),
-              decoration: BoxDecoration(
-                  border: Border.all(color: consts.gray3),
-                  borderRadius: const BorderRadius.all(Radius.circular(24))),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        const Text(
-                          "Your plan is almost done!",
-                          softWrap: false,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: consts.dark,
-                              fontSize: consts.l,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(
-                                "icons/12 Up.svg",
-                                color: consts.green,
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Text(
-                                  "13% than week ago",
-                                  style: TextStyle(
-                                      color: consts.gray, fontSize: consts.s),
-                                ),
-                              ),
-                            ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 0, left: 24, right: 24),
+          child: Column(
+            children: [
+              const Day(),
+              const SizedBox(height: consts.s24),
+              Container(
+                height: 126,
+                padding: const EdgeInsets.all(21),
+                decoration: BoxDecoration(
+                    border: Border.all(color: consts.gray3),
+                    borderRadius: const BorderRadius.all(Radius.circular(24))),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          const Text(
+                            "Your plan is almost done!",
+                            softWrap: false,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: consts.dark,
+                                fontSize: consts.l,
+                                fontWeight: FontWeight.bold),
                           ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  "icons/12 Up.svg",
+                                  color: consts.green,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    "13% than week ago",
+                                    style: TextStyle(
+                                        color: consts.gray, fontSize: consts.s),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  const Graph(chartData: chartData)
-                ],
+                    const Graph(chartData: chartData)
+                  ],
+                ),
               ),
-            ),
-            const MedsList()
-          ],
+              const MedsList()
+            ],
+          ),
         ),
       ),
     );
@@ -91,10 +94,14 @@ class MedsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<AppModel>(
-        builder: (context, model, child) => Expanded(
-                child: ListView(
-              children: model.meds.map((e) => OneMed(med: e)).toList(),
-            )));
+        builder: (context, model, child) =>
+            Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: ListView(
+                    children: model.meds.map((e) => OneMed(med: e)).toList(),
+                  ),
+                )));
   }
 }
 
@@ -105,39 +112,82 @@ class OneMed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(consts.s24),
-      decoration: BoxDecoration(
-          border: Border.all(color: consts.gray3),
-          borderRadius: BorderRadius.circular(18)),
-      child: Row(
-        children: [
-          Image(image: AssetImage(consts.medOptions[med.med]!)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                med.name,
-                style: const TextStyle(
-                    color: consts.dark,
-                    fontSize: consts.m,
-                    fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Slidable(
+        startActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            CustomSlidableAction(onPressed: (ctx) {
+              Provider.of<AppModel>(context, listen: false).setMedDone(med.id);
+            }, child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  border: Border.all(color: consts.gray3),
+                  borderRadius: BorderRadius.circular(18),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("${med.dosage} tablet ${consts.whenOptions[med.when]}",
-                      style: const TextStyle(
-                          color: consts.gray, fontSize: consts.s)),
-                  const Text(
-                    "7 days",
-                    style: TextStyle(color: consts.gray, fontSize: consts.s),
-                  )
-                ],
+              child: Icon(Icons.check, color: med.done ? Colors.green : null,),
+            ))
+          ],
+        ),
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            CustomSlidableAction(onPressed: (ctx) {
+              Provider.of<AppModel>(context, listen: false).removeMedication(med.id);
+            }, child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: consts.gray3),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: const Icon(Icons.delete_outline_outlined),
+            ))
+          ],
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(consts.s24),
+          decoration: BoxDecoration(
+              border: Border.all(color: consts.gray3),
+              borderRadius: BorderRadius.circular(18)),
+          child: Row(
+            children: [
+              Image(image: AssetImage(consts.medOptions[med.med]!)),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        med.name,
+                        style: const TextStyle(
+                            color: consts.dark,
+                            fontSize: consts.m,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("${med.dosage} tablet ${consts.whenOptions[med.when]?.toLowerCase()}",
+                              style: const TextStyle(
+                                  color: consts.gray, fontSize: consts.s)),
+                          const Text(
+                            "7 days",
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: consts.gray, fontSize: consts.s),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
               )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }
@@ -158,45 +208,52 @@ class Graph extends StatelessWidget {
       height: 82,
       decoration: BoxDecoration(
           color: consts.pale, borderRadius: BorderRadius.circular(60)),
-      child: SfCircularChart(annotations: [
-        CircularChartAnnotation(
-            widget: SizedBox(
-                width: 65,
-                height: 65,
-                child: PhysicalModel(
-                    child: Container(),
-                    shape: BoxShape.circle,
-                    color: Colors.white))),
-        CircularChartAnnotation(
-            widget: Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('78',
-                  style: TextStyle(
-                      color: consts.green,
-                      fontSize: consts.l,
-                      fontWeight: FontWeight.bold)),
-              Text('%',
-                  style: TextStyle(
-                    color: consts.green,
-                    fontSize: consts.xs,
-                  ))
-            ],
-          ),
-        ))
-      ], series: <CircularSeries>[
-        // Renders doughnut chart
-        DoughnutSeries<ChartData, String>(
-            dataSource: chartData,
-            pointColorMapper: (ChartData data, _) => data.color,
-            xValueMapper: (ChartData data, _) => data.x,
-            yValueMapper: (ChartData data, _) => data.y,
-            innerRadius: "77%",
-            radius: "135%",
-            cornerStyle: CornerStyle.bothCurve)
-      ]),
+      child: Consumer<AppModel>(
+        builder: (context, model, child) {
+          return SfCircularChart(annotations: [
+            CircularChartAnnotation(
+                widget: SizedBox(
+                    width: 65,
+                    height: 65,
+                    child: PhysicalModel(
+                        child: Container(),
+                        shape: BoxShape.circle,
+                        color: Colors.white))),
+            CircularChartAnnotation(
+                widget: Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text((model.doneMedCount / (model.doneMedCount + model.notDoneMedCount) * 100).floor().toString(),
+                          style: const TextStyle(
+                              color: consts.green,
+                              fontSize: consts.l,
+                              fontWeight: FontWeight.bold)),
+                      const Text('%',
+                          style: TextStyle(
+                            color: consts.green,
+                            fontSize: consts.xs,
+                          ))
+                    ],
+                  ),
+                ))
+          ], series: <CircularSeries>[
+            // Renders doughnut chart
+            DoughnutSeries<ChartData, String>(
+                dataSource: [
+                  ChartData('Full', model.doneMedCount.toDouble(), consts.green),
+                  ChartData('Empty', model.notDoneMedCount.toDouble(), const Color.fromRGBO(0, 0, 0, 0)),
+                ],
+                pointColorMapper: (ChartData data, _) => data.color,
+                xValueMapper: (ChartData data, _) => data.x,
+                yValueMapper: (ChartData data, _) => data.y,
+                innerRadius: "77%",
+                radius: "135%",
+                cornerStyle: model.notDoneMedCount == 0 ? CornerStyle.bothFlat : CornerStyle.bothCurve)
+          ]);
+        }
+      ),
     );
   }
 }
@@ -228,6 +285,7 @@ class Day extends StatelessWidget {
 
 class ChartData {
   const ChartData(this.x, this.y, this.color);
+
   final String x;
   final double y;
   final Color color;

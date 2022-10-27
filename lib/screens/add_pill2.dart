@@ -86,13 +86,14 @@ class AddPillPage2 extends StatelessWidget {
 
 class AddPill2Form extends StatefulWidget {
   final AddPillPage2Arguments medInfo;
+
   const AddPill2Form({Key? key, required this.medInfo}) : super(key: key);
 
   @override
-  State<AddPill2Form> createState() => AddPill2_FormState();
+  State<AddPill2Form> createState() => AddPill2FormState();
 }
 
-class AddPill2_FormState extends State<AddPill2Form> {
+class AddPill2FormState extends State<AddPill2Form> {
   String? time;
   List<String?> doses = [
     null,
@@ -122,6 +123,9 @@ class AddPill2_FormState extends State<AddPill2Form> {
                             setState(() => doses[e.key] = newTime),
                       ))
                   .toList()),
+        ),
+        const SizedBox(
+          height: consts.s12,
         ),
         IconButton(
           padding: const EdgeInsets.all(0),

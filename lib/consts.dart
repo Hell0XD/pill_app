@@ -39,6 +39,13 @@ const medOptions = {
   Med.ing: "icons/ing.png",
 };
 
+const stringMed = {
+  "icons/pill.png": Med.pill,
+  "icons/caps.png": Med.caps,
+  "icons/amp.png": Med.amp,
+  "icons/ing.png": Med.ing,
+};
+
 enum When {
   nevermind,
   beforeMeals,
@@ -51,4 +58,11 @@ const whenOptions = {
   When.beforeMeals: "Before meals",
   When.afterMeals: "After meals",
   When.withFoods: "With foods"
+};
+
+const stringWhen = {
+  "Nevermind": When.nevermind,
+  "Before meals": When.beforeMeals,
+  "After meals": When.afterMeals,
+  "With foods": When.withFoods,
 };
